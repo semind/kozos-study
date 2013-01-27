@@ -13,7 +13,7 @@ OBJDUMP = $(BINDIR)/$(ADDNAME)objdump
 RANLIB  = $(BINDIR)/$(ADDNAME)ranlib
 STRIP   = $(BINDIR)/$(ADDNAME)strip
 
-H8WRITE = /Users/mind/h8-elf/bin/h8write
+H8WRITE = /Users/mind/h8-elf/bin/kz_h8write
 
 H8WRITE_SERDEV = /dev/cu.usbserial
 
