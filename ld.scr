@@ -1,30 +1,55 @@
 OUTPUT_ARCH(h8300h)
 ENTRY("_start")
 
+MEMORY
+{
+    /* o => origin, l => length */
+    romall(rx)    : o = 0x000000, l = 0x080000 /* entire ROM */
+    vectors(r)    : o = 0x000000, l = 0x000100
+    rom(rx)       : o = 0x000100, l = 0x07ff00
+
+    ramall(rwx)   : o = 0xffbf20, l = 0x004000 /* entire RAM */
+    data(rwx)     : o = 0xfffc20, l = 0x000300
+    stack(rw)     : o = 0xffff00, l = 0x000000
+}
+
 SECTIONS
 {
-    . = 0x0;
-
     .vectors : {
         vector.o(.data)
-    }
+    } > vectors /* MEMORYで定義した位置に割り当て */
 
     .text : {
+        _text_start = . ;
         *(.text)
-    }
+        _etext = . ;
+    } > rom
 
     .rodata : {
+        _rodata_start = . ;
         *(.strings)
         *(.rodata)
         *(.rodata.*)
-    }
+        _erodata = . ;
+    } > rom
 
     .data : {
+        _data_start = . ;
         *(.data)
-    }
+        _edata = . ;
+    } > data AT> rom
 
     .bss : {
+        _bss_start = . ;
         *(.bss)
         *(COMMON)
-    }
+        _ebss = . ;
+    } > data AT> rom
+
+    . = ALIGN(4);
+    _end = . ;
+
+    .stack : {
+        _stack = .;
+    } > stack
 }
