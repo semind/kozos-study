@@ -18,7 +18,7 @@ H8WRITE = /Users/mind/h8-elf/bin/kz_h8write
 H8WRITE_SERDEV = /dev/cu.usbserial
 
 OBJS  = vector.o startup.o main.o
-OBJS += lib.o serial.o
+OBJS += lib.o serial.o xmodem.o
 
 TARGET = kzload
 

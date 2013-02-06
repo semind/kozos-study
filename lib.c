@@ -71,11 +71,33 @@ int strncmp(const char *s1, const char *s2, int len)
   return 0;
 }
 
+unsigned char getc(void)
+{
+  unsigned char c = serial_recv_byte(SERIAL_DEFAULT_DEVICE);
+  c = (c == '\r') ? '\n' : c;
+  puts(c);
+  return c;
+}
+
 int putc(unsigned char c)
 {
   if (c == '\n')
     serial_send_byte(SERIAL_DEFAULT_DEVICE, '\r');
   return serial_send_byte(SERIAL_DEFAULT_DEVICE, c);
+}
+
+int gets(unsigned char *buf)
+{
+  int i = 0;
+  unsigned char c;
+
+  do {
+    c = getc();
+    if (c == '\n')
+      c = '\0';
+    buf[i++] = c;
+  } while (c);
+  return i - 1;
 }
 
 int puts(unsigned char *str)
