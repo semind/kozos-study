@@ -1,5 +1,5 @@
-#ifndef _XMODEM_H)INCLUDED_
-#define _XMODEM_H)INCLUDED_
+#ifndef _XMODEM_H_INCLUDED_
+#define _XMODEM_H_INCLUDED_
 
 long xmodem_recv(char *buf);
 

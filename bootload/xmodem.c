@@ -19,13 +19,11 @@ static int xmodem_wait(void)
 
   while (!serial_is_recv_enable(SERIAL_DEFAULT_DEVICE)) {
     if (++cnt >= 2000000) {
-      puts("xmodem wait reset!\n");
       cnt = 0;
       serial_send_byte(SERIAL_DEFAULT_DEVICE, XMODEM_NAK);
     }
   }
 
-  puts("break xmodem_wait!\n");
   return 0;
 }
 
@@ -38,21 +36,17 @@ static int xmodem_read_block(unsigned char block_number, char *buf)
   if (block_num != block_number)
     return -1;
 
-  /* block numberチェック処理。2byte目はblock_numberを反転したものがくる。
-   * 従って1bit目と2byte目でxorを取ると全てのbitが1になるはず。
-   * 1にならない場合は想定しない値が来ている */
   block_num ^= serial_recv_byte(SERIAL_DEFAULT_DEVICE);
   if (block_num != 0xff)
     return -1;
 
   check_sum = 0;
   for (i = 0; i < XMODEM_BLOCK_SIZE; i++) {
-    c= serial_recv_byte(SERIAL_DEFAULT_DEVICE);
+    c = serial_recv_byte(SERIAL_DEFAULT_DEVICE);
     *(buf++) = c;
     check_sum += c;
   }
 
-  /* データ部分チェック処理 */
   check_sum ^= serial_recv_byte(SERIAL_DEFAULT_DEVICE);
   if (check_sum)
     return -1;
@@ -62,7 +56,6 @@ static int xmodem_read_block(unsigned char block_number, char *buf)
 
 long xmodem_recv(char *buf)
 {
-  puts("xmodem_recv start\n");
   int r, receiving = 0;
   long size = 0;
   unsigned char c, block_number = 1;
@@ -71,19 +64,17 @@ long xmodem_recv(char *buf)
     if (!receiving)
       xmodem_wait();
 
-    puts("recv start\n");
-
     c = serial_recv_byte(SERIAL_DEFAULT_DEVICE);
 
-    if (c == XMODEM_EOT) { /* EOT 送信データ終了 ACKを返す */
+    if (c == XMODEM_EOT) {
       serial_send_byte(SERIAL_DEFAULT_DEVICE, XMODEM_ACK);
       break;
-    } else if (c == XMODEM_CAN) { /* CAN 中断 */
+    } else if (c == XMODEM_CAN) {
       return -1;
-    } else if (c == XMODEM_SOH) { /* SOH 受信開始 */
+    } else if (c == XMODEM_SOH) {
       receiving++;
       r = xmodem_read_block(block_number, buf);
-      if (r < 0) { /* 処理に失敗した場合 NAKを返す */
+      if (r < 0) {
         serial_send_byte(SERIAL_DEFAULT_DEVICE, XMODEM_NAK);
       } else {
         block_number++;
