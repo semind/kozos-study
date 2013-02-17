@@ -19,11 +19,13 @@ static int xmodem_wait(void)
 
   while (!serial_is_recv_enable(SERIAL_DEFAULT_DEVICE)) {
     if (++cnt >= 2000000) {
+      puts("xmodem wait reset!\n");
       cnt = 0;
       serial_send_byte(SERIAL_DEFAULT_DEVICE, XMODEM_NAK);
     }
   }
 
+  puts("break xmodem_wait!\n");
   return 0;
 }
 
@@ -60,6 +62,7 @@ static int xmodem_read_block(unsigned char block_number, char *buf)
 
 long xmodem_recv(char *buf)
 {
+  puts("xmodem_recv start\n");
   int r, receiving = 0;
   long size = 0;
   unsigned char c, block_number = 1;
@@ -67,6 +70,8 @@ long xmodem_recv(char *buf)
   while (1) {
     if (!receiving)
       xmodem_wait();
+
+    puts("recv start\n");
 
     c = serial_recv_byte(SERIAL_DEFAULT_DEVICE);
 
